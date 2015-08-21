@@ -1,0 +1,26 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Group hosts by distribution 
+  hosts: all
+  gather_facts: True
+  tasks:
+    - name: create groups based on distro
+      group_by: key={{ ansible_distribution }}
+- name: do something to Ubuntu hosts
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+    - name: Add batcave to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.222 batcave" 
+    - name: Add stargate to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.227 stargate" 
+    - name: Add atlantis to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.229 atlantis" 
+    - name: Add docker to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.233 docker" 
+    - name: Add nas to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.234 nas" 
+    - name: Add pi to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.235 pi" 
+    - name: Add pi2 to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.236 pi2" 
