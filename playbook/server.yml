@@ -6,7 +6,8 @@
   tasks:
     - name: create groups based on distro
       group_by: key={{ ansible_distribution }}
-- name: do something to Ubuntu hosts
+
+- name: Add entries for local machines 
   hosts: Ubuntu
   sudo: True
   tasks:
@@ -24,3 +25,18 @@
       lineinfile: dest=/etc/hosts line="192.168.1.235 pi" 
     - name: Add pi2 to hostfile
       lineinfile: dest=/etc/hosts line="192.168.1.236 pi2" 
+
+- name: Add newrelic monitoring agent 
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+    - name: Add newrelic repository 
+      apt_repository: repo='deb http://apt.newrelic.com/debian/ newrelic non-free' state=present
+    - name: Add newrelic keyfile 
+      apt_key: url=https://download.newrelic.com/548C16BF.gpg state=present
+    - name: Add newrelic agent 
+      apt: name=newrelic-sysmond state=present update_cache=yes
+    - name: Add license key to the configuration 
+      command: nrsysmond-config --set license_key=9a3465dc990aa65ee1037041a7d0f770ef428cfd 
+    - name: Restart the agent 
+      service: name=newrelic-sysmond state=restarted
