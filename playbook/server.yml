@@ -61,3 +61,10 @@
       command: service docker restart
     - name: Add user to the docker group
       user: name={{ ansible_user_id }} state=present groups=docker
+
+- name: Tweak User Account
+  hosts: Ubuntu
+  sudo: False
+  tasks:
+    - name: set editor to VI
+      lineinfile: dest={{ ansible_env.HOME }}/.bashrc line='set -o vi'
