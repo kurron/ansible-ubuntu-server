@@ -59,12 +59,15 @@
       command: update-grub
     - name: Restart Docker
       command: service docker restart
+#TODO: figure out how to add the real account and not the root account
     - name: Add user to the docker group
-      user: name={{ ansible_user_id }} state=present groups=docker
+      user: name=ron state=present groups=docker
 
 - name: Tweak User Account
   hosts: Ubuntu
-  sudo: False
+  sudo: True
   tasks:
+#TODO: figure out how to add the real account and not the root account
     - name: set editor to VI
-      lineinfile: dest={{ ansible_env.HOME }}/.bashrc line='set -o vi'
+#     lineinfile: dest={{ ansible_env.HOME }}/.bashrc line='set -o vi'
+      lineinfile: dest=/home/ron/.bashrc line='set -o vi'
