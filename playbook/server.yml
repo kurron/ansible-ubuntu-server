@@ -60,10 +60,10 @@
     - name: Restart Docker
       command: service docker restart
 #TODO: figure out how to add the real account and not the root account
-    - name: Add user to the docker group
-      user: name=ron state=present groups=docker
+#   - name: Add user to the docker group
+#     user: name=ron state=present groups=docker
 
-- name: Install Redis Container
+- name: Install Redis Docker Containers
   hosts: Ubuntu
   sudo: True
   tasks:
@@ -72,8 +72,18 @@
       - name: Redis
         command: 'docker run --detach --name redis --hostname redis --publish 6379:6379 --volumes-from redis-data --restart always redis redis-server --appendonly yes'
 
-- name: Tweak User Account
+- name: Install RabbitMQ Docker Containers
   hosts: Ubuntu
+  sudo: True
+  tasks:
+      - name: RabbitMQ Data
+        command: 'docker run --detach --name rabbitmq-data --volume /var/lib/rabbitmq busybox'
+      - name: RabbitMQ
+        command: 'docker run --detach --name rabbitmq --hostname rabbitmq --publish 5672:5672 --publish 15672:15672 --volumes-from rabbitmq-data --restart always rabbitmq:management'
+
+- name: Tweak User Account
+# hosts: Ubuntu
+  hosts: nobody
   sudo: False
   tasks:
 #TODO: figure out how to add the real account and not the root account
