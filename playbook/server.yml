@@ -90,6 +90,16 @@
       - name: PostgreSQL
         command: 'docker run --detach --name postgresql --hostname postgresql --publish 5432:5432 --volumes-from postgresql-data --restart always --env POSTGRES_PASSWORD=posgres postgres'
 
+- name: Install MySQL Docker Containers
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+      - name: MySQL Data
+        command: 'docker run --detach --name mysql-data --volume /var/lib/mysql --volume /etc/mysql/conf.d busybox'
+# custom configuration files should be copied into /etc/mysql/conf.d
+      - name: MySQL
+        command: 'docker run --detach --name mysql --hostname mysql --publish 3306:3306 --volumes-from mysql-data --restart always --env MYSQL_ROOT_PASSWORD=root --env MYSQL_USER=mysql --env MYSQL_PASSWORD=mysql --env MYSQL_DATABASE=experiment mysql'
+
 - name: Tweak User Account
 # hosts: Ubuntu
   hosts: nobody
