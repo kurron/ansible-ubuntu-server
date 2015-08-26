@@ -81,6 +81,15 @@
       - name: RabbitMQ
         command: 'docker run --detach --name rabbitmq --hostname rabbitmq --publish 5672:5672 --publish 15672:15672 --volumes-from rabbitmq-data --restart always rabbitmq:management'
 
+- name: Install PostgreSQL Docker Containers
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+      - name: PostgreSQL Data
+        command: 'docker run --detach --name postgresql-data --volume /var/lib/postgresql/data busybox'
+      - name: PostgreSQL
+        command: 'docker run --detach --name postgresql --hostname postgresql --publish 5432:5432 --volumes-from postgresql-data --restart always --env POSTGRES_PASSWORD=posgres postgres'
+
 - name: Tweak User Account
 # hosts: Ubuntu
   hosts: nobody
