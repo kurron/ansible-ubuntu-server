@@ -63,9 +63,18 @@
     - name: Add user to the docker group
       user: name=ron state=present groups=docker
 
-- name: Tweak User Account
+- name: Install Redis Container
   hosts: Ubuntu
   sudo: True
+  tasks:
+      - name: Redis Data
+        command: 'docker run --detach --name redis-data --volume /data busybox'
+      - name: Redis
+        command: 'docker run --detach --name redis --hostname redis --publish 6379:6379 --volumes-from redis-data --restart always redis redis-server --appendonly yes'
+
+- name: Tweak User Account
+  hosts: Ubuntu
+  sudo: False
   tasks:
 #TODO: figure out how to add the real account and not the root account
     - name: set editor to VI
