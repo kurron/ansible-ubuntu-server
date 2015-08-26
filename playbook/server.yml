@@ -100,6 +100,15 @@
       - name: MySQL
         command: 'docker run --detach --name mysql --hostname mysql --publish 3306:3306 --volumes-from mysql-data --restart always --env MYSQL_ROOT_PASSWORD=root --env MYSQL_USER=mysql --env MYSQL_PASSWORD=mysql --env MYSQL_DATABASE=experiment mysql'
 
+- name: Install MongoDB Docker Containers
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+      - name: MongoDB Data
+        command: 'docker run --detach --name mongodb-data --volume /data/db busybox'
+      - name: MongoDB
+        command: 'docker run --detach --name mongodb --hostname mongodb --publish 27017:27017 --volumes-from mongodb-data --restart always mongo --storageEngine=wiredTiger --notablescan --journalCommitInterval=300 --directoryperdb'
+
 - name: Tweak User Account
 # hosts: Ubuntu
   hosts: nobody
