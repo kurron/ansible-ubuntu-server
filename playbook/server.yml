@@ -68,9 +68,13 @@
   sudo: True
   tasks:
       - name: Redis Data
-        command: 'docker run --detach --name redis-data --volume /data busybox'
+        command: docker run --detach --name redis-data --volume /data busybox creates=/var/redis-data
+      - name: Guard Redis Data
+        command: touch /var/redis-data
       - name: Redis
-        command: 'docker run --detach --name redis --hostname redis --publish 6379:6379 --volumes-from redis-data --restart always redis redis-server --appendonly yes'
+        command: docker run --detach --name redis --hostname redis --publish 6379:6379 --volumes-from redis-data --restart always redis redis-server --appendonly yes creates=/var/redis
+      - name: Guard Redis
+        command: touch /var/redis
 
 - name: Install RabbitMQ Docker Containers
   hosts: Ubuntu
