@@ -70,48 +70,64 @@
       - name: Redis Data
         command: docker run --detach --name redis-data --volume /data busybox creates=/var/redis-data
       - name: Guard Redis Data
-        command: touch /var/redis-data
+        command: touch /var/redis-data creates=/var/redis-data
       - name: Redis
         command: docker run --detach --name redis --hostname redis --publish 6379:6379 --volumes-from redis-data --restart always redis redis-server --appendonly yes creates=/var/redis
       - name: Guard Redis
-        command: touch /var/redis
+        command: touch /var/redis creates=/var/redis
 
 - name: Install RabbitMQ Docker Containers
   hosts: Ubuntu
   sudo: True
   tasks:
       - name: RabbitMQ Data
-        command: 'docker run --detach --name rabbitmq-data --volume /var/lib/rabbitmq busybox'
+        command: docker run --detach --name rabbitmq-data --volume /var/lib/rabbitmq busybox creates=/var/rabbitmq-data
+      - name: Guard RabbitMQ Data
+        command: touch /var/rabbitmq-data creates=/var/rabbitmq-data
       - name: RabbitMQ
-        command: 'docker run --detach --name rabbitmq --hostname rabbitmq --publish 5672:5672 --publish 15672:15672 --volumes-from rabbitmq-data --restart always rabbitmq:management'
+        command: docker run --detach --name rabbitmq --hostname rabbitmq --publish 5672:5672 --publish 15672:15672 --volumes-from rabbitmq-data --restart always rabbitmq:management creates=/var/rabbitmq
+      - name: Guard RabbitMQ
+        command: touch /var/rabbitmq creates=/var/rabbitmq
 
 - name: Install PostgreSQL Docker Containers
   hosts: Ubuntu
   sudo: True
   tasks:
       - name: PostgreSQL Data
-        command: 'docker run --detach --name postgresql-data --volume /var/lib/postgresql/data busybox'
+        command: docker run --detach --name postgresql-data --volume /var/lib/postgresql/data busybox creates=/var/postgresql-data
+      - name: Guard PostgreSQL Data
+        command: touch /var/postgresql-data creates=/var/postgresql-data
       - name: PostgreSQL
-        command: 'docker run --detach --name postgresql --hostname postgresql --publish 5432:5432 --volumes-from postgresql-data --restart always --env POSTGRES_PASSWORD=posgres postgres'
+        command: docker run --detach --name postgresql --hostname postgresql --publish 5432:5432 --volumes-from postgresql-data --restart always --env POSTGRES_PASSWORD=posgres postgres creates=/var/postgresql
+      - name: Guard PostgreSQL
+        command: touch /var/postgresql creates=/var/postgresql
 
 - name: Install MySQL Docker Containers
   hosts: Ubuntu
   sudo: True
   tasks:
       - name: MySQL Data
-        command: 'docker run --detach --name mysql-data --volume /var/lib/mysql --volume /etc/mysql/conf.d busybox'
+        command: docker run --detach --name mysql-data --volume /var/lib/mysql --volume /etc/mysql/conf.d busybox creates=/var/mysql-data
 # custom configuration files should be copied into /etc/mysql/conf.d
+      - name: Guard MySQL Data
+        command: touch /var/mysql-data creates=/var/mysql-data
       - name: MySQL
-        command: 'docker run --detach --name mysql --hostname mysql --publish 3306:3306 --volumes-from mysql-data --restart always --env MYSQL_ROOT_PASSWORD=root --env MYSQL_USER=mysql --env MYSQL_PASSWORD=mysql --env MYSQL_DATABASE=experiment mysql'
+        command: docker run --detach --name mysql --hostname mysql --publish 3306:3306 --volumes-from mysql-data --restart always --env MYSQL_ROOT_PASSWORD=root --env MYSQL_USER=mysql --env MYSQL_PASSWORD=mysql --env MYSQL_DATABASE=experiment mysql creates=/var/mysql
+      - name: Guard MySQL
+        command: touch /var/mysql creates=/var/mysql
 
 - name: Install MongoDB Docker Containers
   hosts: Ubuntu
   sudo: True
   tasks:
       - name: MongoDB Data
-        command: 'docker run --detach --name mongodb-data --volume /data/db busybox'
+        command: docker run --detach --name mongodb-data --volume /data/db busybox creates=/var/mongodb-data
+      - name: Guard MongoDB Data
+        command: touch /var/mongodb-data creates=/var/mongodb-data
       - name: MongoDB
-        command: 'docker run --detach --name mongodb --hostname mongodb --publish 27017:27017 --volumes-from mongodb-data --restart always mongo --storageEngine=wiredTiger --notablescan --journalCommitInterval=300 --directoryperdb'
+        command: docker run --detach --name mongodb --hostname mongodb --publish 27017:27017 --volumes-from mongodb-data --restart always mongo --storageEngine=wiredTiger --notablescan --journalCommitInterval=300 --directoryperdb creates=/var/mongodb
+      - name: Guard MongoDB
+        command: touch /var/mongodb creates=/var/mongodb
 
 - name: Tweak User Account
 # hosts: Ubuntu
