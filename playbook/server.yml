@@ -129,6 +129,19 @@
       - name: Guard MongoDB
         command: touch /var/mongodb creates=/var/mongodb
 
+- name: Install BitTorrent Sync Containers
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+      - name: BitTorrent Sync Data
+        command: docker run --detach --name btsync-data --volume /mnt/bookkeeping --volume /mnt/sync busybox creates=/var/btsync-data
+      - name: Guard BitTorrent Sync Data
+        command: touch /var/btsync-data creates=/var/btsync-data
+      - name: BitTorrent Sync
+        command: docker run --detach --name btsync --publish 1234:1234 --publish 8888:8888 --volumes-from btsync-data --restart always --net host kurron/docker-bittorrent-sync creates=/var/btsync
+      - name: Guard BitTorrent Sync
+        command: touch /var/btsync creates=/var/btsync
+
 - name: Tweak User Account
 # hosts: Ubuntu
   hosts: nobody
