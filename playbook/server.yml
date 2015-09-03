@@ -161,6 +161,19 @@
       - name: Guard Plex 
         command: touch /var/plex creates=/var/plex
 
+- name: Install BitTorrent Client 
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+      - name: Transmission Data
+        command: docker run --detach --name transmission-data --volume /var/lib/transmission-daemon busybox creates=/var/transmission
+      - name: Transmission Data
+        command: touch /var/transmission-data creates=/var/transmission-data
+      - name: Transmission
+        command: docker run --detach --name transmission --publish 9091:9091 --publish 51413:51413 --volumes-from transmission-data --restart always --net host --env TRUSER=admin --env TRPASSWD=admin --env TIMEZONE=UTC dperson/transmission creates=/var/transmission
+      - name: Guard Transmission 
+        command: touch /var/transmission creates=/var/transmission
+
 - name: Tweak User Account
 # hosts: Ubuntu
   hosts: nobody
