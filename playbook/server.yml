@@ -158,10 +158,10 @@
         command: touch /var/plex-data creates=/var/plex-data
       - name: Plex Media Server
         command: docker run --detach --name plex --publish 32400:32400 --volumes-from plex-data --volumes-from btsync-data --volume /mnt/nas:/data --restart always --net host timhaak/plex creates=/var/plex
-      - name: Guard Plex 
+      - name: Guard Plex
         command: touch /var/plex creates=/var/plex
 
-- name: Install BitTorrent Client 
+- name: Install BitTorrent Client
   hosts: Ubuntu
   sudo: True
   tasks:
@@ -171,10 +171,10 @@
         command: touch /var/transmission-data creates=/var/transmission-data
       - name: Transmission
         command: docker run --detach --name transmission --publish 9091:9091 --publish 51413:51413 --volumes-from transmission-data --restart always --net host --env TRUSER=admin --env TRPASSWD=admin --env TIMEZONE=UTC dperson/transmission creates=/var/transmission
-      - name: Guard Transmission 
+      - name: Guard Transmission
         command: touch /var/transmission creates=/var/transmission
 
-- name: Install  Apt Cache 
+- name: Install Apt Cache
   hosts: Ubuntu
   sudo: True
   tasks:
