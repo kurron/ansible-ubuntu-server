@@ -142,6 +142,25 @@
       - name: Guard BitTorrent Sync
         command: touch /var/btsync creates=/var/btsync
 
+- name: Install Plex Media Server Containers
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+      - name: Install NFS client
+        apt: name=nfs-common state=latest update_cache=true cache_valid_time=600
+      - name: Create the NAS mount point
+        file: path=/mnt/nas state=directory
+      - name: Mount NAS drive
+        mount: fstype=nfs name=/mnt/nas src=nas:/media state=mounted opts=ro
+      - name: Plex Data
+        command: docker run --detach --name plex-data --volume /config busybox creates=/var/plex-data
+      - name: Guard Plex Data
+        command: touch /var/plex-data creates=/var/plex-data
+      - name: Plex Media Server
+        command: docker run --detach --name plex --publish 32400:32400 --volumes-from plex-data --volumes-from btsync-data --volume /mnt/nas:/data --restart always --net host timhaak/plex creates=/var/plex
+      - name: Guard Plex 
+        command: touch /var/plex creates=/var/plex
+
 - name: Tweak User Account
 # hosts: Ubuntu
   hosts: nobody
