@@ -167,12 +167,27 @@
   tasks:
       - name: Transmission Data
         command: docker run --detach --name transmission-data --volume /var/lib/transmission-daemon busybox creates=/var/transmission
-      - name: Transmission Data
+      - name: Guard Transmission Data
         command: touch /var/transmission-data creates=/var/transmission-data
       - name: Transmission
         command: docker run --detach --name transmission --publish 9091:9091 --publish 51413:51413 --volumes-from transmission-data --restart always --net host --env TRUSER=admin --env TRPASSWD=admin --env TIMEZONE=UTC dperson/transmission creates=/var/transmission
       - name: Guard Transmission 
         command: touch /var/transmission creates=/var/transmission
+
+- name: Install  Apt Cache 
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+      - name: Apt Cache Data
+        command: docker run --detach --name apt-cache-data --volume /var/cache/apt-cacher busybox creates=/var/apt-cache-data
+      - name: Guard Apt Cache Data
+        command: touch /var/apt-cache-data creates=/var/apt-cache-data
+      - name: Apt Cache
+        command: docker run --detach --name apt-cache --hostname apt-cache --publish 3142:3142 --volumes-from apt-cache-data --restart always clue/apt-cacher creates=/var/apt-cache
+      - name: Guard Apt Cache 
+        command: touch /var/apt-cache creates=/var/apt-cache
+      - name: Copy Apt configuration file
+        copy: src=files/01proxy dest=/etc/apt/apt.conf.d/01proxy owner=root group=root mode=644 backup=no
 
 - name: Tweak User Account
 # hosts: Ubuntu
