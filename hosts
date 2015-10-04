@@ -1,0 +1,2 @@
+# change the IP to point to the desire target machine
+targetserver ansible_ssh_host=52.25.108.33 ansible_ssh_port=22
