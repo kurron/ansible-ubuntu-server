@@ -14,6 +14,25 @@
     - name: Set the hostname to clean-slate
       hostname: name=clean-slate
 
+- name: Add entries for local machines
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+    - name: Add batcave to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.222 batcave"
+    - name: Add stargate to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.227 stargate"
+    - name: Add atlantis to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.229 atlantis"
+    - name: Add docker to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.233 docker"
+    - name: Add nas to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.234 nas"
+    - name: Add pi to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.235 pi"
+    - name: Add pi2 to hostfile
+      lineinfile: dest=/etc/hosts line="192.168.1.236 pi2"
+
 - name: Install Docker
   hosts: Ubuntu
 # hosts: nobody
