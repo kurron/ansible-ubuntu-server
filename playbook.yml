@@ -144,3 +144,14 @@
       - name: Install Sysdig
         apt: name=sysdig state=latest update_cache=true
 
+- name: Mount NAS Drive
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+      - name: Install NFS client
+        apt: name=nfs-common state=latest update_cache=true cache_valid_time=600
+      - name: Create the NAS mount point
+        file: path=/mnt/nas state=directory
+      - name: Mount NAS drive
+        mount: fstype=nfs name=/mnt/nas src=nas:/media state=mounted opts=ro
+
