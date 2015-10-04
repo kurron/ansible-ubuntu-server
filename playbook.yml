@@ -54,6 +54,20 @@
     - name: Echo Docker Compose version
       command: docker-compose --version
 
+- name: Tweak User Account
+  hosts: Ubuntu
+  sudo: False
+  vars_prompt:
+    - name: "userAccount"
+      prompt: "The account to apply the tweaks to"
+      private: no
+      default: "ubuntu"
+  tasks:
+    - name: set editor to VI
+#     lineinfile: dest={{ ansible_env.HOME }}/.bashrc line='set -o vi'
+      lineinfile: dest={{ userAccount }}/.bashrc line='set -o vi'
+#     lineinfile: dest=/home/ron/.bashrc line='set -o vi'
+
 - name: Install Git
   hosts: Ubuntu
   sudo: True
