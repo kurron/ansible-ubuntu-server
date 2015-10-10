@@ -22,7 +22,7 @@
     - name: Add account to the docker group
       user: name=dd-agent groups=docker
     - name: Copy Docker configuration file
-      copy: src=files//docker_daemon.yaml dest=/etc/dd-agent/conf.d/docker_daemon.yaml owner=dd-agent group=root mode=0444
+      copy: src=files/docker_daemon.yaml dest=/etc/dd-agent/conf.d/docker_daemon.yaml owner=dd-agent group=root mode=0444
 #   - name: Copy RabbitMQ configuration file
 #     copy: src=files/rabbitmq.yaml dest=/etc/dd-agent/conf.d/rabbitmq.yaml owner=dd-agent group=root mode=0444
 #   - name: Copy HTTP Check configuration file
