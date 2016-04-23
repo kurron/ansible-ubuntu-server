@@ -27,18 +27,11 @@
       lineinfile: dest=/etc/hosts line="192.168.1.236 pi2"
 
 - name: Tweak User Account
-  hosts: nobody
+  hosts: Ubuntu
   become: False
-  vars_prompt:
-    - name: "userAccount"
-      prompt: "The account to apply the tweaks to"
-      private: no
-      default: "ubuntu"
   tasks:
     - name: set editor to VI
-#     lineinfile: dest={{ ansible_env.HOME }}/.bashrc line='set -o vi'
-      lineinfile: dest={{ userAccount }}/.bashrc line='set -o vi'
-#     lineinfile: dest=/home/ron/.bashrc line='set -o vi'
+      lineinfile: dest=/home/rkurr/.bashrc line='set -o vi'
 
 - name: Install Git
   hosts: Ubuntu
@@ -125,4 +118,23 @@
         file: path=/mnt/nas state=directory
       - name: Mount NAS drive
         mount: fstype=nfs name=/mnt/nas src=nas:/media state=mounted opts=ro
+
+- name: Mount NAS Drive (Atlantis)
+  hosts: atlantis
+  become: True
+  tasks:
+      - name: Install NFS client
+        apt: name=nfs-common state=latest update_cache=true cache_valid_time=600
+      - name: Create the NAS mount point
+        file: path=/mnt/plex-configuration state=directory
+      - name: Mount NAS drive
+        mount: fstype=nfs name=/mnt/plex-configuration src=nas:/atlantis-pc state=mounted opts=rw
+      - name: Create the NAS mount point
+        file: path=/mnt/torrent-sync state=directory
+      - name: Mount NAS drive
+        mount: fstype=nfs name=/mnt/torrent-sync src=nas:/atlantis-sync state=mounted opts=rw
+      - name: Create the NAS mount point
+        file: path=/mnt/torrent-book state=directory
+      - name: Mount NAS drive
+        mount: fstype=nfs name=/mnt/torrent-book src=nas:/atlantis-book state=mounted opts=rw
 
