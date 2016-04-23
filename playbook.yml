@@ -7,16 +7,9 @@
     - name: create groups based on distribution
       group_by: key={{ ansible_distribution }}
 
-- name: Set Hostname
-  hosts: Ubuntu
-  sudo: True
-  tasks:
-    - name: Set the hostname to clean-slate
-      hostname: name=clean-slate
-
 - name: Add entries for local machines
   hosts: Ubuntu
-  sudo: True
+  become: True
   tasks:
     - name: Add batcave to hostfile
       lineinfile: dest=/etc/hosts line="192.168.1.222 batcave"
@@ -33,49 +26,9 @@
     - name: Add pi2 to hostfile
       lineinfile: dest=/etc/hosts line="192.168.1.236 pi2"
 
-- name: Install Docker
-  hosts: Ubuntu
-# hosts: nobody
-  sudo: True
-  vars_prompt:
-    - name: "userAccount"
-      prompt: "The account to add to the docker group."
-      private: no
-      default: "ubuntu"
-    - name: "composeVersion"
-      prompt: "Docker Compose version to install."
-      private: no
-      default: "1.4.1"
-
-  tasks:
-    - debug: msg="userAccount = {{ userAccount }}"
-    - debug: msg="composeVersion = {{ composeVersion }}"
-    - name: Install cURL
-      apt: name=curl state=latest update_cache=true cache_valid_time=600
-    - name: Download Docker Installation Script
-      command: /usr/bin/curl --location --output /root/install-docker https://get.docker.com/
-    - name: Set Permission Bits On The Docker Installation Script
-      file: path=/root/install-docker owner=root group=root mode=0500 
-    - name: Execute Docker Installation Script
-      shell: /root/install-docker 
-    - name: Set Memory and Swap Accounting
-      lineinfile: dest=/etc/default/grub regexp='^GRUB_CMDLINE_LINUX=""' line='GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"'
-    - name: Add account to the docker group 
-      user: name={{ userAccount }} groups=docker 
-    - name: Restart Docker
-      command: service docker restart
-    - name: Test Docker
-      command: docker run hello-world
-    - name: Download Docker Compose Script
-      shell: /usr/bin/curl --location --output /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/{{ composeVersion }}/docker-compose-`uname -s`-`uname -m`
-    - name: Set Permission Bits On The Docker Compose Script
-      file: path=/usr/local/bin/docker-compose owner=root group=root mode=0555
-    - name: Echo Docker Compose version
-      command: docker-compose --version
-
 - name: Tweak User Account
-  hosts: Ubuntu
-  sudo: False
+  hosts: nobody
+  become: False
   vars_prompt:
     - name: "userAccount"
       prompt: "The account to apply the tweaks to"
@@ -89,14 +42,14 @@
 
 - name: Install Git
   hosts: Ubuntu
-  sudo: True
+  become: True
   tasks:
     - name: Install Git
       apt: name=git state=latest update_cache=true cache_valid_time=600
 
 - name: Install Git Projects
-  hosts: Ubuntu
-  sudo: False
+  hosts: nobody
+  become: False
   tasks:
     - name: Make GitHub Directory
       file: path={{ ansible_env.HOME }}/GitHub state=directory mode=0755
@@ -105,24 +58,9 @@
     - name: Pull Down Data Pump 
       git: repo=https://github.com/kurron/docker-monitor-jmeter.git dest={{ ansible_env.HOME }}/GitHub/docker-monitor-jmeter
 
-- name: Update Hosts File 
-  hosts: Ubuntu
-  sudo: True
-  tasks:
-    - name: Add MongoDB entry 
-      lineinfile: dest=/etc/hosts line="127.0.0.1 mongodb" 
-    - name: Add Redis entry 
-      lineinfile: dest=/etc/hosts line="127.0.0.1 redis" 
-    - name: Add MySQL entry 
-      lineinfile: dest=/etc/hosts line="127.0.0.1 mysql" 
-    - name: Add PostgreSQL entry 
-      lineinfile: dest=/etc/hosts line="127.0.0.1 postgresql" 
-    - name: Add RabbitMQ entry 
-      lineinfile: dest=/etc/hosts line="127.0.0.1 rabbitmq" 
-
 - name: Install Newrelic
-  hosts: Ubuntu
-  sudo: True
+  hosts: nobody
+  become: True
   vars_prompt:
     - name: "apiKey"
       prompt: "The Newrelic API key to use."
@@ -143,8 +81,8 @@
       service: name=newrelic-sysmond state=restarted
 
 - name: Configure Rsyslog To Forward to Loggly
-  hosts: Ubuntu
-  sudo: True
+  hosts: nobody
+  become: True
   vars_prompt:
     - name: "logglyKey"
       prompt: "The Loggly API key to use."
@@ -165,8 +103,8 @@
       command: logger 'Hello From Ansible!'
 
 - name: Install Sysdig
-  hosts: Ubuntu
-  sudo: True
+  hosts: nobody
+  become: True
   tasks:
       - name: Download the signing key
         apt_key: url=https://s3.amazonaws.com/download.draios.com/DRAIOS-GPG-KEY.public state=present
@@ -179,7 +117,7 @@
 
 - name: Mount NAS Drive
   hosts: Ubuntu
-  sudo: True
+  become: True
   tasks:
       - name: Install NFS client
         apt: name=nfs-common state=latest update_cache=true cache_valid_time=600
