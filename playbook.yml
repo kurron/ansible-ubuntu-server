@@ -74,7 +74,7 @@
       service: name=newrelic-sysmond state=restarted
 
 - name: Configure Rsyslog To Forward to Loggly
-  hosts: nobody
+  hosts: Ubuntu
   become: True
   vars_prompt:
     - name: "logglyKey"
@@ -84,7 +84,7 @@
     - name: "logglyTag"
       prompt: "The Loggly Tag to use."
       private: no
-      default: "monitor-experiment"
+      default: "basement"
   tasks:
     - debug: msg="logglyKey = {{ logglyKey }}"
     - debug: msg="logglyPath = {{ logglyTag }}"
