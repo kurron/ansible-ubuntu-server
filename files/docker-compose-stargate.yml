@@ -1,0 +1,12 @@
+# Stargate 
+version: '2'
+services:
+    plex:
+        image: timhaak/plex:latest
+        container_name: plex
+        restart: always
+        network_mode: host
+        volumes:
+        - /mnt/plex-configuration:/config
+        - /mnt/nas:/mnt/media:ro
+        - /mnt/torrent-sync:/mnt/torrent:ro
