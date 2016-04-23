@@ -10,6 +10,9 @@ services:
         - /mnt/plex-configuration:/config
         - /mnt/nas:/mnt/media:ro
         - /mnt/torrent-sync:/mnt/torrent:ro
+        environment:
+            SKIP_CHOWN_CONFIG: "TRUE"
+
     data-dog:
         image:  datadog/docker-dd-agent:latest
         container_name: data-dog
