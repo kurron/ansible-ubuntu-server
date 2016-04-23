@@ -175,3 +175,11 @@
     - name: Echo Docker Machine version
       command: docker-machine --version
 
+- name: Install Compose Scripts (Atlantis)
+  hosts: atlantis
+  become: False
+  tasks:
+    - name: Create the Compose folder
+      file: path=/home/rkurr/docker-compose state=directory mode=0755
+    - name: Copy Docker Compose file
+      copy: src=files/docker-compose-atlantis.yml dest=/home/rkurr/docker-compose/docker-compose.yml owner=rkurr group=rkurr mode=444 backup=yes
