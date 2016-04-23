@@ -9,3 +9,14 @@ services:
         volumes:
         - /mnt/torrent-book:/mnt/bookkeeping
         - /mnt/torrent-sync:/mnt/sync
+    data-dog:
+        image:  datadog/docker-dd-agent:latest
+        container_name: data-dog
+        restart: always
+        network_mode: "host"
+        environment:
+            API_KEY: 4a2ad6741d78c9f690510083065a0bff
+        volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc/:/host/proc/:ro
+        - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
