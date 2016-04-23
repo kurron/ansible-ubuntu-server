@@ -97,7 +97,7 @@
       command: logger 'Hello From Ansible!'
 
 - name: Install Sysdig
-  hosts: nobody
+  hosts: Ubuntu
   become: True
   tasks:
       - name: Download the signing key
