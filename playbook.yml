@@ -138,3 +138,40 @@
       - name: Mount NAS drive
         mount: fstype=nfs name=/mnt/torrent-book src=nas:/atlantis-book state=mounted opts=rw
 
+- name: Install Docker
+  hosts: Ubuntu
+  become: True
+  tasks:
+    - name: Install cURL
+      apt: name=curl state=latest update_cache=true cache_valid_time=600
+    - name: Download Docker Installation Script
+      command: /usr/bin/curl --location --output /root/install-docker https://get.docker.com/
+    - name: Set Permission Bits On The Docker Installation Script
+      file: path=/root/install-docker owner=root group=root mode=0500
+    - name: Execute Docker Installation Script
+      shell: /root/install-docker
+    - name: Create the Docker configuration folder for 16.04 boxes
+      file: path=/etc/systemd/system/docker.service.d state=directory mode=0755
+    - name: Copy Docker configuration file for 16.04 boxes
+      copy: src=files/root-dir.conf dest=/etc/systemd/system/docker.service.d/root-dir.conf owner=root group=root mode=444 backup=no
+    - name: Add account to the docker group
+      command: usermod -aG docker rkurr
+    - name: Flush changes
+      command: systemctl daemon-reload
+    - name: Restart Docker
+      command: systemctl restart docker
+    - name: Test Docker
+      command: docker run hello-world
+
+    - name: Download Docker Compose Script
+      shell: /usr/bin/curl --location --output /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.7.0/docker-compose-`uname -s`-`uname -m`
+    - name: Set Permission Bits On The Docker Compose Script
+      file: path=/usr/local/bin/docker-compose owner=root group=root mode=0555
+    - name: Echo Docker Compose version
+      command: docker-compose --version
+
+    - name: Download Docker Machine Archive
+      get_url: url=https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-Linux-x86_64 dest=/usr/local/bin/docker-machine mode=0555
+    - name: Echo Docker Machine version
+      command: docker-machine --version
+
