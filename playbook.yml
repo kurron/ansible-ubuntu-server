@@ -54,11 +54,8 @@
 - name: Install Newrelic
   hosts: nobody
   become: True
-  vars_prompt:
-    - name: "apiKey"
-      prompt: "The Newrelic API key to use."
-      private: no
-      default: "9a3465dc990aa65ee1037041a7d0f770ef428cfd"
+  vars:
+      apiKey: "9a3465dc990aa65ee1037041a7d0f770ef428cfd"
   tasks:
     - name: Add newrelic repository
       apt_repository: repo='deb http://apt.newrelic.com/debian/ newrelic non-free' state=present
@@ -76,18 +73,10 @@
 - name: Configure Rsyslog To Forward to Loggly
   hosts: Ubuntu
   become: True
-  vars_prompt:
-    - name: "logglyKey"
-      prompt: "The Loggly API key to use."
-      private: no
-      default: "91ec9498-62c1-42fc-b9e9-a977628cb17d"
-    - name: "logglyTag"
-      prompt: "The Loggly Tag to use."
-      private: no
-      default: "basement"
+  vars:
+      logglyKey: "91ec9498-62c1-42fc-b9e9-a977628cb17d"
+      logglyTag: "basement"
   tasks:
-    - debug: msg="logglyKey = {{ logglyKey }}"
-    - debug: msg="logglyPath = {{ logglyTag }}"
     - name: Copy Rsyslog Configuration File 
       template: src=templates/loggly.conf dest=/etc/rsyslog.d/22-loggly.conf mode=0444 backup=yes force=yes
     - name: Restart the Rsyslog
