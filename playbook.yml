@@ -153,6 +153,10 @@
         file: path=/mnt/torrent-sync state=directory
       - name: Mount NAS drive
         mount: fstype=nfs name=/mnt/torrent-sync src=nas:/atlantis-sync state=mounted opts=ro
+      - name: Create the NAS mount point
+        file: path=/mnt/owncloud state=directory
+      - name: Mount NAS drive
+        mount: fstype=nfs name=/mnt/owncloud src=nas:/stargate-own state=mounted opts=rw
 
 - name: Install Docker
   hosts: nobody
