@@ -25,3 +25,27 @@ services:
         - /proc/:/host/proc/:ro
         - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
 
+    mysql:
+        image: mysql:latest
+        container_name: mysql
+        network_mode: host
+        restart: always
+        volumes:
+        - /mnt/mysql:/var/lib/mysql:rw
+        environment:
+            MYSQL_ROOT_PASSWORD: sa
+            MYSQL_USER: mysql
+            MYSQL_PASSWORD: mysql
+            MYSQL_DATABASE: owncloud
+
+    owncloud:
+        image: owncloud:latest
+        container_name: owncloud
+        restart: always
+        network_mode: host
+        volumes:
+        - /mnt/owncloud:/var/www/html:rw
+        - /mnt/nas:/mnt/media:ro
+        - /mnt/torrent-sync:/mnt/torrent:ro
+        depends_on:
+        - mysql

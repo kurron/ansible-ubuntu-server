@@ -157,6 +157,10 @@
         file: path=/mnt/owncloud state=directory
       - name: Mount NAS drive
         mount: fstype=nfs name=/mnt/owncloud src=nas:/stargate-own state=mounted opts=rw
+      - name: Create the NAS mount point
+        file: path=/mnt/mysql state=directory
+      - name: Mount NAS drive
+        mount: fstype=nfs name=/mnt/mysql src=nas:/stargate-mysql state=mounted opts=rw
 
 - name: Install Docker
   hosts: nobody
