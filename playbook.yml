@@ -139,9 +139,13 @@
       - name: Mount NAS drive
         mount: fstype=nfs name=/mnt/torrent-book src=nas:/atlantis-book state=mounted opts=rw
       - name: Create the NAS mount point
-        file: path=/mnt/artifactory state=directory
+        file: path=/mnt/artifactory/data state=directory
       - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/artifactory src=nas:/atlantis-jfrog state=mounted opts=rw
+        mount: fstype=nfs name=/mnt/artifactory/data src=nas:/atlantis-jfrog-data state=mounted opts=rw
+      - name: Create the NAS mount point
+        file: path=/mnt/artifactory/etc state=directory
+      - name: Mount NAS drive
+        mount: fstype=nfs name=/mnt/artifactory/etc src=nas:/atlantis-jfrog-etc state=mounted opts=rw
 
 - name: Mount NAS Drive (Stargate)
   hosts: stargate
