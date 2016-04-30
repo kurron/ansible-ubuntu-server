@@ -31,4 +31,24 @@ services:
         - /mnt/torrent-sync:/mnt/torrent:ro
         environment:
             SKIP_CHOWN_CONFIG: "TRUE"
+    artifactory-data:
+        image: busybox:latest
+        container_name: artifactory-data
+        network_mode: none
+        command: "true"
+        volumes:
+        - /var/opt/jfrog/artifactory/logs
+        - /var/opt/jfrog/artifactory/backup
+        - /var/opt/jfrog/artifactory/etc
+    artifactory:
+        image: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:latest
+        container_name: artifactory
+        restart: always
+        network_mode: host
+        volumes_from:
+        - artifactory-data:rw
+        volumes:
+        - /mnt/artifactory/data:/var/opt/jfrog/artifactory/data:rw
+        environment:
+        - ARTIFACTORY_HOME=/var/opt/jfrog/artifactory
 
