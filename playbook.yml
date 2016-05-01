@@ -146,6 +146,10 @@
         file: path=/mnt/artifactory/etc state=directory
       - name: Mount NAS drive
         mount: fstype=nfs name=/mnt/artifactory/etc src=nas:/atlantis-jfrog-etc state=mounted opts=rw
+      - name: Create the NAS mount point
+        file: path=/mnt/consul state=directory
+      - name: Mount NAS drive
+        mount: fstype=nfs name=/mnt/consul src=nas:/atlantis-consul state=mounted opts=rw
 
 - name: Mount NAS Drive (Stargate)
   hosts: stargate
@@ -215,6 +219,10 @@
       file: path=/home/rkurr/docker-compose state=directory mode=0755
     - name: Copy Docker Compose file
       copy: src=files/docker-compose-atlantis.yml dest=/home/rkurr/docker-compose/docker-compose.yml owner=rkurr group=rkurr mode=444 backup=no
+    - name: Create the Consul configuration directory 
+      file: path=/home/rkurr/docker-compose/consul state=directory mode=0755
+    - name: Copy Consul configuration file
+      copy: src=files/consul-atlantis.json dest=/home/rkurr/docker-compose/consul/atlantis.json owner=rkurr group=rkurr mode=444 backup=no
 
 - name: Install Compose Scripts (Stargate)
   hosts: stargate

@@ -51,4 +51,13 @@ services:
         - /mnt/artifactory/data:/var/opt/jfrog/artifactory/data:rw
         environment:
         - ARTIFACTORY_HOME=/var/opt/jfrog/artifactory
+    consul:
+        image: consul:latest
+        container_name: consul
+        restart: always
+        network_mode: host
+        volumes:
+        - ./consul:/consul/config:ro
+        - /mnt/consul:/consul/data:rw
+        command: consul agent -config-dir /consul/config
 
