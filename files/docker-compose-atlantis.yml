@@ -39,7 +39,6 @@ services:
         volumes:
         - /var/opt/jfrog/artifactory/logs
         - /var/opt/jfrog/artifactory/backup
-        - /var/opt/jfrog/artifactory/etc
     artifactory:
         image: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:latest
         container_name: artifactory
@@ -48,6 +47,7 @@ services:
         volumes_from:
         - artifactory-data:rw
         volumes:
+        - /mnt/artifactory/etc:/var/opt/jfrog/artifactory/etc:rw
         - /mnt/artifactory/data:/var/opt/jfrog/artifactory/data:rw
         environment:
         - ARTIFACTORY_HOME=/var/opt/jfrog/artifactory
