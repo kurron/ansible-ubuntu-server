@@ -68,3 +68,10 @@ services:
         volumes:
         - /mnt/elasticsearch:/usr/share/elasticsearch/data:rw
         command:  elasticsearch -Des.node.name="Basement"
+    kibana:
+        image: kibana:latest
+        container_name: kibana
+        restart: always
+        network_mode: host
+        environment:
+            ELASTICSEARCH_URL: http://192.168.1.229:9200
