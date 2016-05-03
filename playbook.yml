@@ -150,6 +150,10 @@
         file: path=/mnt/consul state=directory
       - name: Mount NAS drive
         mount: fstype=nfs name=/mnt/consul src=nas:/atlantis-consul state=mounted opts=rw
+      - name: Create the NAS mount point
+        file: path=/mnt/elasticsearch state=directory
+      - name: Mount NAS drive
+        mount: fstype=nfs name=/mnt/elasticsearch src=nas:/atlantis-search state=mounted opts=rw
 
 - name: Mount NAS Drive (Stargate)
   hosts: stargate

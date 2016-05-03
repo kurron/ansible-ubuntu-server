@@ -60,4 +60,11 @@ services:
         - ./consul:/consul/config:ro
         - /mnt/consul:/consul/data:rw
         command: consul agent -config-dir /consul/config
-
+    elasticsearch:
+        image: elasticsearch:latest
+        container_name: elasticsearch
+        restart: always
+        network_mode: host
+        volumes:
+        - /mnt/elasticsearch:/usr/share/elasticsearch/data:rw
+        command:  elasticsearch -Des.node.name="Basement"
