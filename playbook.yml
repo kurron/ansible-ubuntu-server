@@ -231,6 +231,10 @@
       file: path=/home/rkurr/docker-compose/consul state=directory mode=0755
     - name: Copy Consul configuration file
       copy: src=files/consul-atlantis.json dest=/home/rkurr/docker-compose/consul/atlantis.json owner=rkurr group=rkurr mode=444 backup=no
+    - name: Create the Logstash configuration directory
+      file: path=/home/rkurr/docker-compose/logstash state=directory mode=0755
+    - name: Copy Logstash configuration file
+      copy: src=files/logstash-atlantis.conf dest=/home/rkurr/docker-compose/logstash/logstash.conf owner=rkurr group=rkurr mode=444 backup=no
 
 - name: Install Compose Scripts (Stargate)
   hosts: stargate

@@ -75,3 +75,12 @@ services:
         network_mode: host
         environment:
             ELASTICSEARCH_URL: http://192.168.1.229:9200
+    logstash:
+        image: logstash:latest
+        container_name: logstash
+        restart: always
+        network_mode: host
+        volumes:
+        - ./logstash:/config:ro
+        command: logstash -f /config/logstash.conf
+
