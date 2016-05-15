@@ -83,4 +83,10 @@ services:
         volumes:
         - ./logstash:/config:ro
         command: logstash -f /config/logstash.conf
-
+    configuration-server:
+        image: kurron/docker-spring-cloud-configuration-server:1.1.0
+        container_name: configuration-server
+        restart: always
+        network_mode: host
+        environment:
+            SPRING_CLOUD_CONSUL_HOST: 192.168.1.229
