@@ -120,6 +120,14 @@
       - name: Mount NAS drive
         mount: fstype=nfs name=/mnt/nas src=nas:/media state=mounted opts=ro
 
+# use https://www.atlantic.net/community/howto/setup-rsync-daemon/ as guidance
+- name: Install Rsync Daemon (Atlantis)
+  hosts: atlantis
+  become: True
+  tasks:
+      - name: Install Rsync
+        apt: name=rsync state=latest update_cache=true cache_valid_time=600
+
 - name: Mount NAS Drive (Atlantis)
   hosts: atlantis
   become: True
