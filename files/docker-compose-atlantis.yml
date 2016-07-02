@@ -7,7 +7,7 @@ services:
         restart: always
         network_mode: host
         volumes:
-        - /mnt/torrent-book:/mnt/bookkeeping
+        - /mnt/torrent-book:/mnt/sync/bookkeeping
         - /mnt/torrent-sync:/mnt/sync
     data-dog:
         image:  datadog/docker-dd-agent:latest
