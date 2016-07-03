@@ -230,6 +230,8 @@
 - name: Install Compose Scripts (Atlantis)
   hosts: atlantis
   become: False
+  tags:
+    - compose
   tasks:
     - name: Create the Compose folder
       file: path=/home/rkurr/docker-compose state=directory mode=0755
@@ -247,6 +249,8 @@
 - name: Install Compose Scripts (Stargate)
   hosts: stargate
   become: False
+  tags:
+    - compose
   tasks:
     - name: Create the Compose folder
       file: path=/home/rkurr/docker-compose state=directory mode=0755

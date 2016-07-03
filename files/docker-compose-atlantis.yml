@@ -84,9 +84,16 @@ services:
         - ./logstash:/config:ro
         command: logstash -f /config/logstash.conf
     configuration-server:
-        image: kurron/docker-spring-cloud-configuration-server:1.1.0
+        image: kurron/docker-spring-cloud-configuration-server:1.2.0
         container_name: configuration-server
         restart: always
         network_mode: host
         environment:
-            SPRING_CLOUD_CONSUL_HOST: 192.168.1.229
+            SPRING_CLOUD_CONSUL_HOST: "192.168.1.229"
+            JVM_HEAP_MIN: "128m"
+            JVM_HEAP_MAX: "128m"
+            JVM_JMX_PORT: "8020"
+            JVM_JMX_RMI_PORT: "8020"
+            JVM_JMX_HOST: "192.168.1.229"
+            SERVER_PORT: "8080"
+

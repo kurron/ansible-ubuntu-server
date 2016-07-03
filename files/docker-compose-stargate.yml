@@ -65,4 +65,10 @@ services:
         network_mode: host
         environment:
             SPRING_CLOUD_CONSUL_HOST: 192.168.1.227
+            JVM_HEAP_MIN: "128m"
+            JVM_HEAP_MAX: "128m"
+            JVM_JMX_PORT: "8020"
+            JVM_JMX_RMI_PORT: "8020"
+            JVM_JMX_HOST: "192.168.1.227"
+            SERVER_PORT: "8080"
 
