@@ -30,7 +30,7 @@
     - name: Add atlantis to hostfile
       lineinfile: dest=/etc/hosts line="192.168.1.229 atlantis"
     - name: Add docker to hostfile
-      lineinfile: dest=/etc/hosts line="192.168.1.233 docker"
+      lineinfile: dest=/etc/hosts line="192.168.1.233 bifrost"
     - name: Add nas to hostfile
       lineinfile: dest=/etc/hosts line="192.168.1.234 nas"
     - name: Add pi to hostfile
