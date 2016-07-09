@@ -9,6 +9,7 @@ services:
         volumes:
         - /mnt/torrent-book:/mnt/sync/bookkeeping
         - /mnt/torrent-sync:/mnt/sync
+
     data-dog:
         image:  datadog/docker-dd-agent:latest
         container_name: data-dog
@@ -20,6 +21,7 @@ services:
         - /var/run/docker.sock:/var/run/docker.sock
         - /proc/:/host/proc/:ro
         - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+
     plex:
         image: timhaak/plex:latest
         container_name: plex
@@ -31,6 +33,7 @@ services:
         - /mnt/torrent-sync:/mnt/torrent:ro
         environment:
             SKIP_CHOWN_CONFIG: "TRUE"
+
     artifactory-data:
         image: busybox:latest
         container_name: artifactory-data
@@ -39,6 +42,7 @@ services:
         volumes:
         - /var/opt/jfrog/artifactory/logs
         - /var/opt/jfrog/artifactory/backup
+
     artifactory:
         image: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:latest
         container_name: artifactory
@@ -51,6 +55,7 @@ services:
         - /mnt/artifactory/data:/var/opt/jfrog/artifactory/data:rw
         environment:
         - ARTIFACTORY_HOME=/var/opt/jfrog/artifactory
+
     consul:
         image: consul:latest
         container_name: consul
@@ -59,7 +64,7 @@ services:
         volumes:
         - ./consul:/consul/config:ro
         - /mnt/consul:/consul/data:rw
-        command: consul agent -config-dir /consul/config
+
     elasticsearch:
         image: elasticsearch:latest
         container_name: elasticsearch
@@ -68,6 +73,7 @@ services:
         volumes:
         - /mnt/elasticsearch:/usr/share/elasticsearch/data:rw
         command:  elasticsearch -Des.node.name="Basement"
+
     kibana:
         image: kibana:latest
         container_name: kibana
@@ -75,6 +81,7 @@ services:
         network_mode: host
         environment:
             ELASTICSEARCH_URL: http://192.168.1.229:9200
+
     logstash:
         image: logstash:latest
         container_name: logstash
@@ -83,6 +90,7 @@ services:
         volumes:
         - ./logstash:/config:ro
         command: logstash -f /config/logstash.conf
+
     configuration-server:
         image: kurron/docker-spring-cloud-configuration-server:1.2.0
         container_name: configuration-server

@@ -49,6 +49,7 @@ services:
         - /mnt/torrent-sync:/mnt/torrent:ro
         depends_on:
         - mysql
+
     consul:
         image: consul:latest
         container_name: consul
@@ -57,7 +58,7 @@ services:
         volumes:
         - ./consul:/consul/config:ro
         - /mnt/consul:/consul/data:rw
-        command: consul agent -config-dir /consul/config
+
     configuration-server:
         image: kurron/docker-spring-cloud-configuration-server:1.1.0
         container_name: configuration-server
