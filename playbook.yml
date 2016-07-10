@@ -11,10 +11,8 @@
   hosts: Ubuntu
   become: True
   tasks:
-    - name: Upgrade currently installed packages
-      apt: "upgrade=dist state=present update_cache=true cache_valid_time=600"
-    - name: Install common packages
-      apt: "name={{ item }} state=present update_cache=true cache_valid_time=600"
+    - apt: "upgrade=dist state=present update_cache=true cache_valid_time=600"
+    - apt: "name={{ item }} state=present update_cache=true cache_valid_time=600"
       with_items:
          - tree
          - fail2ban
@@ -23,64 +21,25 @@
   hosts: Ubuntu
   become: True
   tasks:
-    - name: Add batcave to hostfile
-      lineinfile: dest=/etc/hosts line="192.168.1.222 batcave"
-    - name: Add stargate to hostfile
-      lineinfile: dest=/etc/hosts line="192.168.1.227 stargate"
-    - name: Add atlantis to hostfile
-      lineinfile: dest=/etc/hosts line="192.168.1.229 atlantis"
-    - name: Add docker to hostfile
-      lineinfile: dest=/etc/hosts line="192.168.1.233 bifrost"
-    - name: Add nas to hostfile
-      lineinfile: dest=/etc/hosts line="192.168.1.234 nas"
-    - name: Add pi to hostfile
-      lineinfile: dest=/etc/hosts line="192.168.1.235 pi"
-    - name: Add pi2 to hostfile
-      lineinfile: dest=/etc/hosts line="192.168.1.236 pi2"
+    - lineinfile: dest=/etc/hosts line="192.168.1.222 batcave"
+    - lineinfile: dest=/etc/hosts line="192.168.1.227 stargate"
+    - lineinfile: dest=/etc/hosts line="192.168.1.229 atlantis"
+    - lineinfile: dest=/etc/hosts line="192.168.1.233 bifrost"
+    - lineinfile: dest=/etc/hosts line="192.168.1.234 nas"
+    - lineinfile: dest=/etc/hosts line="192.168.1.235 pi"
+    - lineinfile: dest=/etc/hosts line="192.168.1.236 pi2"
 
 - name: Tweak User Account
   hosts: Ubuntu
   become: False
   tasks:
-    - name: set editor to VI
-      lineinfile: dest=/home/rkurr/.bashrc line='set -o vi'
+    - lineinfile: dest=/home/rkurr/.bashrc line='set -o vi'
 
 - name: Install Git
   hosts: Ubuntu
   become: True
   tasks:
-    - name: Install Git
-      apt: name=git state=latest update_cache=true cache_valid_time=600
-
-- name: Install Git Projects
-  hosts: nobody
-  become: False
-  tasks:
-    - name: Make GitHub Directory
-      file: path={{ ansible_env.HOME }}/GitHub state=directory mode=0755
-    - name: Pull Down Monitoring Infrastructure
-      git: repo=https://github.com/kurron/docker-monitor-compose.git dest={{ ansible_env.HOME }}/GitHub/docker-monitor-compose
-    - name: Pull Down Data Pump 
-      git: repo=https://github.com/kurron/docker-monitor-jmeter.git dest={{ ansible_env.HOME }}/GitHub/docker-monitor-jmeter
-
-- name: Install Newrelic
-  hosts: nobody
-  become: True
-  vars:
-      apiKey: "9a3465dc990aa65ee1037041a7d0f770ef428cfd"
-  tasks:
-    - name: Add newrelic repository
-      apt_repository: repo='deb http://apt.newrelic.com/debian/ newrelic non-free' state=present
-    - name: Add newrelic keyfile
-      apt_key: url=https://download.newrelic.com/548C16BF.gpg state=present
-    - name: Add newrelic agent
-      apt: name=newrelic-sysmond state=present update_cache=yes
-    - name: Add license key to the configuration
-      command: nrsysmond-config --set license_key={{ apiKey }}
-    - name: Add newrelic account to the docker group so it can monitor containers
-      user: name=newrelic groups=docker
-    - name: Restart the agent
-      service: name=newrelic-sysmond state=restarted
+    - apt: name=git state=latest update_cache=true cache_valid_time=600
 
 - name: Configure Rsyslog To Forward to Loggly
   hosts: Ubuntu
@@ -89,143 +48,110 @@
       logglyKey: "91ec9498-62c1-42fc-b9e9-a977628cb17d"
       logglyTag: "basement"
   tasks:
-    - name: Copy Rsyslog Configuration File 
-      template: src=templates/loggly.conf dest=/etc/rsyslog.d/22-loggly.conf mode=0444 backup=yes force=yes
-    - name: Restart the Rsyslog
-      command: /usr/sbin/service rsyslog restart
-    - name: Send a test message 
-      command: logger 'Hello From Ansible!'
+    - template: src=templates/loggly.conf dest=/etc/rsyslog.d/22-loggly.conf mode=0444 backup=yes force=yes
+    - command: /usr/sbin/service rsyslog restart
+    - command: logger 'Hello From Ansible!'
 
 - name: Install Sysdig
   hosts: Ubuntu
   become: True
   tasks:
-      - name: Download the signing key
-        apt_key: url=https://s3.amazonaws.com/download.draios.com/DRAIOS-GPG-KEY.public state=present
-      - name: Add the Apt repository
-        apt_repository: repo='deb http://download.draios.com/stable/deb stable-$(ARCH)/' state=present
-      - name: Install Headers
-        shell: apt-get -y install linux-headers-$(uname -r)
-      - name: Install Sysdig
-        apt: name=sysdig state=latest update_cache=true
+      - apt_key: url=https://s3.amazonaws.com/download.draios.com/DRAIOS-GPG-KEY.public state=present
+      - apt_repository: repo='deb http://download.draios.com/stable/deb stable-$(ARCH)/' state=present
+      - shell: apt-get -y install linux-headers-$(uname -r)
+      - apt: name=sysdig state=latest update_cache=true
 
 - name: Mount NAS Drive
   hosts: Ubuntu
   become: True
   tasks:
-      - name: Install NFS client
-        apt: name=nfs-common state=latest update_cache=true cache_valid_time=600
-      - name: Create the NAS mount point
-        file: path=/mnt/nas state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/nas src=nas:/media state=mounted opts=ro
+      - apt: name=nfs-common state=latest update_cache=true cache_valid_time=600
+      - file: path=/mnt/nas state=directory
+      - mount: fstype=nfs name=/mnt/nas src=nas:/media state=mounted opts=ro
 
 # use https://www.atlantic.net/community/howto/setup-rsync-daemon/ as guidance
 - name: Install Rsync Daemon (Atlantis)
   hosts: atlantis
   become: True
+  tags:
+    - rsync
   tasks:
-      - name: Install Rsync
-        apt: name=rsync state=latest update_cache=true cache_valid_time=600
+      - apt: name=rsync state=latest update_cache=true cache_valid_time=600
+      - apt: name=ntfs-3g state=latest update_cache=true cache_valid_time=600
+      - copy: src=files/rsyncd.conf dest=/etc/rsyncd.conf owner=root group=root mode=0444 backup=no
+      - copy: src=files/rsyncd.secrets dest=/etc/rsyncd.secrets owner=root group=root mode=0600 backup=no
+      # in /etc/fstab use this: UUID=5C28F67528F64D90 /mnt/backup ntfs-3g defaults,uid=1000,gid=1000,dmask=027,fmask=137,windows_names,locale=en_US.utf8 0 0 
+      # after you change the password, run rsync --daemon
 
 - name: Mount NAS Drive (Atlantis)
   hosts: atlantis
   become: True
   tasks:
-      - name: Install NFS client
-        apt: name=nfs-common state=latest update_cache=true cache_valid_time=600
-      - name: Create the NAS mount point
-        file: path=/mnt/plex-configuration state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/plex-configuration src=nas:/atlantis-pc state=mounted opts=rw
-      - name: Create the NAS mount point
-        file: path=/mnt/torrent-sync state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/torrent-sync src=nas:/atlantis-sync state=mounted opts=rw
-      - name: Create the NAS mount point
-        file: path=/mnt/torrent-book state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/torrent-book src=nas:/atlantis-book state=mounted opts=rw
-      - name: Create the NAS mount point
-        file: path=/mnt/artifactory/data state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/artifactory/data src=nas:/atlantis-jfrog-data state=mounted opts=rw
-      - name: Create the NAS mount point
-        file: path=/mnt/artifactory/etc state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/artifactory/etc src=nas:/atlantis-jfrog-etc state=mounted opts=rw
-      - name: Create the NAS mount point
-        file: path=/mnt/consul state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/consul src=nas:/atlantis-consul state=mounted opts=rw
-      - name: Create the NAS mount point
-        file: path=/mnt/elasticsearch state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/elasticsearch src=nas:/atlantis-search state=mounted opts=rw
+      - apt: name=nfs-common state=latest update_cache=true cache_valid_time=600
+      - file: path=/mnt/plex-configuration state=directory
+      - mount: fstype=nfs name=/mnt/plex-configuration src=nas:/atlantis-pc state=mounted opts=rw
+      - file: path=/mnt/torrent-sync state=directory
+      - mount: fstype=nfs name=/mnt/torrent-sync src=nas:/atlantis-sync state=mounted opts=rw
+      - file: path=/mnt/torrent-book state=directory
+      - mount: fstype=nfs name=/mnt/torrent-book src=nas:/atlantis-book state=mounted opts=rw
+      - file: path=/mnt/artifactory/data state=directory
+      - mount: fstype=nfs name=/mnt/artifactory/data src=nas:/atlantis-jfrog-data state=mounted opts=rw
+      - file: path=/mnt/artifactory/etc state=directory
+      - mount: fstype=nfs name=/mnt/artifactory/etc src=nas:/atlantis-jfrog-etc state=mounted opts=rw
+      - file: path=/mnt/consul state=directory
+      - mount: fstype=nfs name=/mnt/consul src=nas:/atlantis-consul state=mounted opts=rw
+      - file: path=/mnt/elasticsearch state=directory
+      - mount: fstype=nfs name=/mnt/elasticsearch src=nas:/atlantis-search state=mounted opts=rw
 
 - name: Mount NAS Drive (Stargate)
   hosts: stargate
   become: True
   tasks:
-      - name: Install NFS client
-        apt: name=nfs-common state=latest update_cache=true cache_valid_time=600
-      - name: Create the NAS mount point
-        file: path=/mnt/plex-configuration state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/plex-configuration src=nas:/stargate-pc state=mounted opts=rw
-      - name: Create the NAS mount point
-        file: path=/mnt/torrent-sync state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/torrent-sync src=nas:/atlantis-sync state=mounted opts=ro
-      - name: Create the NAS mount point
-        file: path=/mnt/owncloud state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/owncloud src=nas:/stargate-own state=mounted opts=rw
-      - name: Create the NAS mount point
-        file: path=/mnt/mysql state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/mysql src=nas:/stargate-mysql state=mounted opts=rw
-      - name: Create the NAS mount point
-        file: path=/mnt/consul state=directory
-      - name: Mount NAS drive
-        mount: fstype=nfs name=/mnt/consul src=nas:/stargate-consul state=mounted opts=rw
+      - apt: name=nfs-common state=latest update_cache=true cache_valid_time=600
+      - file: path=/mnt/plex-configuration state=directory
+      - mount: fstype=nfs name=/mnt/plex-configuration src=nas:/stargate-pc state=mounted opts=rw
+      - file: path=/mnt/torrent-sync state=directory
+      - mount: fstype=nfs name=/mnt/torrent-sync src=nas:/atlantis-sync state=mounted opts=ro
+      - file: path=/mnt/owncloud state=directory
+      - mount: fstype=nfs name=/mnt/owncloud src=nas:/stargate-own state=mounted opts=rw
+      - file: path=/mnt/mysql state=directory
+      - mount: fstype=nfs name=/mnt/mysql src=nas:/stargate-mysql state=mounted opts=rw
+      - file: path=/mnt/consul state=directory
+      - mount: fstype=nfs name=/mnt/consul src=nas:/stargate-consul state=mounted opts=rw
+
+- name: Mount NAS Drive (Bifrost)
+  hosts: bifrost
+  become: True
+  tasks:
+      - apt: name=nfs-common state=latest update_cache=true cache_valid_time=600
+      - file: path=/mnt/plex-configuration state=directory
+      - mount: fstype=nfs name=/mnt/plex-configuration src=nas:/bifrost-pc state=mounted opts=rw
+      - file: path=/mnt/torrent-sync state=directory
+      - mount: fstype=nfs name=/mnt/torrent-sync src=nas:/atlantis-sync state=mounted opts=ro
+      - file: path=/mnt/consul state=directory
+      - mount: fstype=nfs name=/mnt/consul src=nas:/bifrost-consul state=mounted opts=rw
 
 - name: Install Docker
   hosts: nobody
   become: True
   tasks:
-    - name: Install cURL
-      apt: name=curl state=latest update_cache=true cache_valid_time=600
-    - name: Download Docker Installation Script
-      command: /usr/bin/curl --location --output /root/install-docker https://get.docker.com/
-    - name: Set Permission Bits On The Docker Installation Script
-      file: path=/root/install-docker owner=root group=root mode=0500
-    - name: Execute Docker Installation Script
-      shell: /root/install-docker
-    - name: Create the Docker configuration folder for 16.04 boxes
-      file: path=/etc/systemd/system/docker.service.d state=directory mode=0755
-    - name: Copy Docker configuration file for 16.04 boxes
-      copy: src=files/root-dir.conf dest=/etc/systemd/system/docker.service.d/root-dir.conf owner=root group=root mode=444 backup=no
-    - name: Add account to the docker group
-      command: usermod -aG docker rkurr
-    - name: Flush changes
-      command: systemctl daemon-reload
-    - name: Restart Docker
-      command: systemctl restart docker
-    - name: Test Docker
-      command: docker run hello-world
+    - apt: name=curl state=latest update_cache=true cache_valid_time=600
+    - command: /usr/bin/curl --location --output /root/install-docker https://get.docker.com/
+    - file: path=/root/install-docker owner=root group=root mode=0500
+    - shell: /root/install-docker
+    - file: path=/etc/systemd/system/docker.service.d state=directory mode=0755
+    - copy: src=files/root-dir.conf dest=/etc/systemd/system/docker.service.d/root-dir.conf owner=root group=root mode=444 backup=no
+    - command: usermod -aG docker rkurr
+    - command: systemctl daemon-reload
+    - command: systemctl restart docker
+    - command: docker run hello-world
 
-    - name: Download Docker Compose Script
-      shell: /usr/bin/curl --location --output /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.7.0/docker-compose-`uname -s`-`uname -m`
-    - name: Set Permission Bits On The Docker Compose Script
-      file: path=/usr/local/bin/docker-compose owner=root group=root mode=0555
-    - name: Echo Docker Compose version
-      command: docker-compose --version
+    - shell: /usr/bin/curl --location --output /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.7.1/docker-compose-`uname -s`-`uname -m`
+    - file: path=/usr/local/bin/docker-compose owner=root group=root mode=0555
+    - command: docker-compose --version
 
-    - name: Download Docker Machine Archive
-      get_url: url=https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-Linux-x86_64 dest=/usr/local/bin/docker-machine mode=0555
-    - name: Echo Docker Machine version
-      command: docker-machine --version
+    - get_url: url=https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-Linux-x86_64 dest=/usr/local/bin/docker-machine mode=0555
+    - command: docker-machine --version
 
 - name: Install Compose Scripts (Atlantis)
   hosts: atlantis
@@ -233,18 +159,12 @@
   tags:
     - compose
   tasks:
-    - name: Create the Compose folder
-      file: path=/home/rkurr/docker-compose state=directory mode=0755
-    - name: Copy Docker Compose file
-      copy: src=files/docker-compose-atlantis.yml dest=/home/rkurr/docker-compose/docker-compose.yml owner=rkurr group=rkurr mode=444 backup=no
-    - name: Create the Consul configuration directory
-      file: path=/home/rkurr/docker-compose/consul state=directory mode=0755
-    - name: Copy Consul configuration file
-      copy: src=files/consul-atlantis.json dest=/home/rkurr/docker-compose/consul/atlantis.json owner=rkurr group=rkurr mode=444 backup=no
-    - name: Create the Logstash configuration directory
-      file: path=/home/rkurr/docker-compose/logstash state=directory mode=0755
-    - name: Copy Logstash configuration file
-      copy: src=files/logstash-atlantis.conf dest=/home/rkurr/docker-compose/logstash/logstash.conf owner=rkurr group=rkurr mode=444 backup=no
+    - file: path=/home/rkurr/docker-compose state=directory mode=0755
+    - copy: src=files/docker-compose-atlantis.yml dest=/home/rkurr/docker-compose/docker-compose.yml owner=rkurr group=rkurr mode=444 backup=no
+    - file: path=/home/rkurr/docker-compose/consul state=directory mode=0755
+    - copy: src=files/consul-atlantis.json dest=/home/rkurr/docker-compose/consul/atlantis.json owner=rkurr group=rkurr mode=444 backup=no
+    - file: path=/home/rkurr/docker-compose/logstash state=directory mode=0755
+    - copy: src=files/logstash-atlantis.conf dest=/home/rkurr/docker-compose/logstash/logstash.conf owner=rkurr group=rkurr mode=444 backup=no
 
 - name: Install Compose Scripts (Stargate)
   hosts: stargate
@@ -252,12 +172,19 @@
   tags:
     - compose
   tasks:
-    - name: Create the Compose folder
-      file: path=/home/rkurr/docker-compose state=directory mode=0755
-    - name: Copy Docker Compose file
-      copy: src=files/docker-compose-stargate.yml dest=/home/rkurr/docker-compose/docker-compose.yml owner=rkurr group=rkurr mode=444 backup=no
-    - name: Create the Consul configuration directory
-      file: path=/home/rkurr/docker-compose/consul state=directory mode=0755
-    - name: Copy Consul configuration file
-      copy: src=files/consul-stargate.json dest=/home/rkurr/docker-compose/consul/stargate.json owner=rkurr group=rkurr mode=444 backup=no
+    - file: path=/home/rkurr/docker-compose state=directory mode=0755
+    - copy: src=files/docker-compose-stargate.yml dest=/home/rkurr/docker-compose/docker-compose.yml owner=rkurr group=rkurr mode=444 backup=no
+    - file: path=/home/rkurr/docker-compose/consul state=directory mode=0755
+    - copy: src=files/consul-stargate.json dest=/home/rkurr/docker-compose/consul/stargate.json owner=rkurr group=rkurr mode=444 backup=no
+
+- name: Install Compose Scripts (Bifrost)
+  hosts: bifrost
+  become: False
+  tags:
+    - compose
+  tasks:
+    - file: path=/home/rkurr/docker-compose state=directory mode=0755
+    - copy: src=files/docker-compose-bifrost.yml dest=/home/rkurr/docker-compose/docker-compose.yml owner=rkurr group=rkurr mode=444 backup=no
+    - file: path=/home/rkurr/docker-compose/consul state=directory mode=0755
+    - copy: src=files/consul-bifrost.json dest=/home/rkurr/docker-compose/consul/bifrost.json owner=rkurr group=rkurr mode=444 backup=no
 

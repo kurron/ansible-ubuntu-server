@@ -1,0 +1,36 @@
+# Bifrost
+version: '2'
+services:
+    plex:
+        image: timhaak/plex:latest
+        container_name: plex
+        restart: always
+        network_mode: host
+        volumes:
+        - /mnt/plex-configuration:/config
+        - /mnt/nas:/mnt/media:ro
+        - /mnt/torrent-sync:/mnt/torrent:ro
+        environment:
+            SKIP_CHOWN_CONFIG: "TRUE"
+
+    data-dog:
+        image:  datadog/docker-dd-agent:latest
+        container_name: data-dog
+        restart: always
+        network_mode: "host"
+        environment:
+            API_KEY: 4a2ad6741d78c9f690510083065a0bff
+        volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc/:/host/proc/:ro
+        - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+
+    consul:
+        image: consul:latest
+        container_name: consul
+        restart: always
+        network_mode: host
+        volumes:
+        - ./consul:/consul/config:ro
+        - /mnt/consul:/consul/data:rw
+
